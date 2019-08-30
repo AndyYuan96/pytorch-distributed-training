@@ -9,7 +9,6 @@ import os
 import argparse
 
 # the default is using two gpus 0 and 1
-# run the code in terminal: python -m torch.distributed.launch --nproc_per_node=2 simple_example.py
 
 batch_size = 128
 os.environ['CUDA_VISIBLE_DEVICES'] = "0,1"
@@ -27,12 +26,12 @@ class Lenet(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=1,out_channels=6,kernel_size=5,stride=1)
         self.conv2 = nn.Conv2d(in_channels=6,out_channels=16,kernel_size=5,stride=1)
         self.conv3 = nn.Conv2d(in_channels=16,out_channels=120,kernel_size=4,stride=1)
-        
+
         self.fc1 = nn.Linear(in_features=120,out_features=84,bias=True)
         self.fc2 = nn.Linear(in_features=84,out_features=10,bias=True)
-        
+
     def forward(self,x):
-	
+
         x = self.conv1(x)
         x = F.max_pool2d(x,2)
         x = F.relu(x)
@@ -44,15 +43,15 @@ class Lenet(nn.Module):
         x = x.view(x.shape[0],-1)
         x = self.fc1(x)
         x = self.fc2(x)
-        
-        return x 
+
+        return x
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--local_rank', type=int, default=0)
 parser.add_argument('--ngpu', type=int, default=2)
 args = parser.parse_args()
- 
+
 # step 1
 world_size = args.ngpu
 torch.distributed.init_process_group(
